@@ -12,10 +12,13 @@
 ```bash
 $ composer install
 ```
-#### 将.env.example复制到.env，修改其中的数据库参数，执行数据迁移：
+#### 将.env.example复制到.env，配置数据库参数、邮件参数。
+#### 生成密钥，执行数据迁移：
 
 ```bash
+$ php artisan key:generate
 $ php artisan migrate
+$ php artisan db:seed
 ```
 
 ## License
