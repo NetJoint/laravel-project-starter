@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'PRC'),
 
     /*
     |--------------------------------------------------------------------------
@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => env('APP_LOCALE', 'zh-cn'),
 
     /*
     |--------------------------------------------------------------------------
@@ -109,6 +109,20 @@ return [
     */
 
     'log' => env('APP_LOG', 'single'),
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Other Configuration
+    |--------------------------------------------------------------------------
+    */
+    
+    'site_name' => 'Your Project Name',
+    
+    'domain' => env('SERVER_DOMAIN', 'localhost'),
+    
+    'static_url' => env('SERVER_STATIC', 'http://localhost'),
+    
+    'upload_url' => env('SERVER_UPLOAD', 'http://localhost'),
 
     /*
     |--------------------------------------------------------------------------
@@ -119,7 +133,7 @@ return [
     | request to your application. Feel free to add your own services to
     | this array to grant expanded functionality to your applications.
     |
-    */
+    */    
 
     'providers' => [
 
