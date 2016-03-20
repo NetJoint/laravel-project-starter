@@ -1,31 +1,44 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Routes File
-|--------------------------------------------------------------------------
-|
-| Here is where you will register all of the routes in an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the controller to call when that URI is requested.
-|
-*/
+# 页面路由组
+Route::group(['middleware' => ['web']], function () {    
+    # 主页
+    Route::get('/', 'WelcomeController@index');
+    # 注册页
+    Route::get('/', 'AuthController@getRegister');
+    
+    
+    
+    
+    
 
-Route::get('/', function () {
-    return view('welcome');
+    Route::group(['middleware' => ['role:user']], function() {
+        # 普通用户可见页面
+        
+    });
+    
+    Route::group(['middleware' => ['role:admin']], function() {
+        # 管理员可见页面
+        
+    });
+    
+    
 });
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| This route group applies the "web" middleware group to every route
-| it contains. The "web" middleware group is defined in your HTTP
-| kernel and includes session state, CSRF protection, and more.
-|
-*/
+# API路由组
+$api = app('Dingo\Api\Routing\Router');
+$api->version('v1', function ($api) {
+    $api->group(['namespace' => 'App\Http\Controllers\Api'], function ($api) {
 
-Route::group(['middleware' => ['web']], function () {
-    //
+
+        $api->group(['middleware' => ['role:user']], function ($api) {
+            # 普通用户可用API
+            
+        });
+
+        $api->group(['middleware' => ['role:admin']], function ($api) {
+            # 管理员可用API
+            
+        });
+    });
 });
