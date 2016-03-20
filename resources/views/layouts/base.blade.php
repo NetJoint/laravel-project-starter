@@ -15,7 +15,7 @@
             <meta name="description" content="">
         @show
         @yield("css")
-        <link href="/lib/bootstrap2/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/lib/bootstrap2-sui/css/sui.min.css" rel="stylesheet">
         <link href="/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
         <link href="/css/website.css" rel="stylesheet">
         @yield("style")
@@ -33,7 +33,7 @@
             <p class="browsehappy">您使用的浏览器<strong>版本过低</strong>，请<a href="http://browsehappy.com/">点此升级您的浏览器</a>以获得更好的体验。</p>
         <![endif]-->
         @yield("body")
-        <script src="/lib/bootstrap2/js/bootstrap.min.js"></script>        
+        <script src="/lib/bootstrap2-sui/js/sui.min.js"></script>
         @yield("script")
         <script src="/js/website.js"></script>        
     </body>

@@ -3,18 +3,59 @@
 <title>账号密码设置 - {{sitename()}}</title>
 @stop
 @section('script')
+<script>
+    $('.form').on('submit', function (e) {
+        $('button:submit', this).button('loading');
+    })
+</script>
 @stop
 @section('body')
 <div class="container">
-    <form class="form-signin" method="post" action="/activate" data-toggle="validator">
-        <h2 class="form-signin-heading">账号密码设置</h2>
+    <div class="box-auth">
+        <h3><i class="icon icon-touch-user-info"></i> 账号密码设置</h3>
         <hr/>
-        <input type="hidden" name="id" value="{{$userid}}">
-        <input type="hidden" name="code" value="{{$code}}">
-        <input id="name" name="name" value="" type="text" placeholder="您的昵称" class="form-control" data-minlength="2" data-minlength-error="昵称至少为2个字符" data-error="请填写您的昵称" required>
-        <input id="password" name="password" value="" type="password" placeholder="您的密码" class="form-control" data-minlength="6" data-minlength-error="密码至少6位" data-error="请填写您的密码" required>
-        <input value="" type="password" placeholder="确认密码" class="form-control"  data-match-error="两次输入的密码不一致" data-match="#password" data-error="请确认您的密码" required>
-       <button class="btn btn-large btn-primary" type="submit">完成注册</button>
-    </form>    
+        @if (count($errors) > 0)
+        <div class="msg msg-block msg-large msg-error">
+            <div class="msg-con">
+                {!! $errors->first('email') !!}
+            </div>
+            <s class="msg-icon"></s>
+        </div>
+        @endif
+        <form class="form validate" method="post" action="/activate">
+            <input type="hidden" name="id" value="{{$userid}}">
+            <input type="hidden" name="code" value="{{$code}}">
+            <div class="control-group">
+                <div class="controls">
+                    <div class="input-control control-right">
+                        <input class="input-xfat input-large" name="name" value="{{ Input::old('name')}}" type="text" placeholder="您的昵称" data-rules="required">
+                        <i class="icon icon-touch-face"></i>
+                    </div>                   
+                </div>                
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <div class="input-control control-right">
+                        <input class="input-xfat input-large" id="password" name="password" value="" type="password" placeholder="您的密码" data-rules="required|minlength=6">
+                        <i class="icon icon-touch-key"></i>
+                    </div>                   
+                </div>                
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <div class="input-control control-right">
+                        <input class="input-xfat input-large" id="repassword" value="" type="password" placeholder="确认密码" data-rules="required|match=password">
+                        <i class="icon icon-touch-key-sign"></i>
+                    </div>                   
+                </div>                
+            </div>
+            
+            <div class="control-group">
+                <div class="controls">
+                    <button class="btn btn-block btn-xlarge btn-primary" type="submit" data-loading-text="正在激活用户..." autocomplete="off">完成注册</button>
+                </div>
+            </div>            
+        </form>        
+    </div>    
 </div>
 @stop

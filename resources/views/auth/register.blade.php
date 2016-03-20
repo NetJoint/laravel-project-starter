@@ -5,23 +5,42 @@
 @section('script')
 <script>
     $('input[name="email"]').focus();
-    $('.form-signin').on('submit', function (e) {
-        $('#email_btn').button('loading');
+    $('.form').on('submit', function (e) {
+        $('button:submit',this).button('loading');
     })
 </script>
 @stop
 @section('body')
 <div class="container">
-    <form class="form-signin" method="post" action="/register/email" data-toggle="validator">
-        <h2 class="form-signin-heading">注册</h2>
+    <div class="box-auth">
+        <h3><i class="icon icon-touch-user-add"></i> 注 册</h3>
         <hr/>
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <input type="text" name="email" value="" class="form-control" placeholder="请填写您的邮箱" required>        
-        <button id="email_btn" class="btn btn-large btn-primary" type="submit" data-loading-text="正在发送邮件..." autocomplete="off">立即注册</button>
-        <hr/>
-        <div class="text-center">
-            已有帐号?<a href="/login">点此登录</a><br/>            
+        @if (count($errors) > 0)
+        <div class="msg msg-block msg-large msg-error">
+            <div class="msg-con">
+                {!! $errors->first('email') !!}
+            </div>
+            <s class="msg-icon"></s>
         </div>
-    </form>    
+        @endif
+        <form class="form validate" method="post" action="/register/email">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="control-group">
+                <div class="controls">
+                    <div class="input-control control-right">
+                        <input class="input-xfat input-large {{$errors->has('email') ? 'input-error' : ''}}" name="email" value="{{ Input::old('email')}}" type="text" placeholder="您的邮箱"  data-rules="required">
+                        <i class="icon icon-touch-email2"></i>
+                    </div>                   
+                </div>                
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <button class="btn btn-block btn-xlarge btn-primary" type="submit" data-loading-text="正在发送邮件..." autocomplete="off">立即注册</button>
+                </div>
+            </div>            
+        </form>
+        <hr/>
+        已有帐号?<a href="/login">点此登录</a><br/>
+    </div>    
 </div>
 @stop

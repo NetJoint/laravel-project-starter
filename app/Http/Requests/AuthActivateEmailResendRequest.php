@@ -19,11 +19,6 @@ class AuthActivateEmailResendRequest extends FormRequest
         ];
     }
 
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
     public function authorize()
     {
         return true;
@@ -31,7 +26,11 @@ class AuthActivateEmailResendRequest extends FormRequest
 
     public function messages()
     {
-        return [];
+        return [
+            'email' => '邮箱地址未注册，请您先<a href="/register">注册</a>',
+            'email.email' => '邮箱地址格式不正确',
+            'email.required' => '请输入邮箱地址'
+        ];
     }
 
 }

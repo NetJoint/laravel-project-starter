@@ -6,20 +6,22 @@
 @stop
 @section('body')
 <div class="container">
-    <h5>邮件已发送到您的邮箱</h5>
-    <h5 class="text-danger">{{$email}}</h5>
-    <h5>请点击邮箱中的验证链接完成验证</h5>
-    <a class="btn btn-large btn-primary" href="{{email_website($email)}}" target="_blank">前往邮箱验证</a>
-    <hr/>
-    <div class="text-center">
-        没有收到邮件?
+    <div class="box-auth">
+        <h3 class="text-success"><i class="icon icon-pc-right-circle"></i> 邮件发送成功</h3>
+        <hr/>
+        <h4 class="text-danger">发送到邮箱：{{$email}}</h4>
+        <h4>请点击验证链接完成验证</h4>
+        <a class="btn btn-block btn-xlarge btn-primary" href="{{email_website($email)}}" target="_blank">前往邮箱验证</a>
+        <hr/>
+        <div class="msg msg-question msg-block">
+            <div class="msg-con">
+                <strong>没有收到邮件?</strong><br>
+                1、检查Email地址有没有写错<br>
+                2、看看是否在垃圾邮箱里<br>
+                3、点此<a href="/activate/email/resend?email={{$email}}">重新发送验证邮件</a>
+            </div>
+            <s class="msg-icon"></s>
+        </div>
     </div>
-    <div class="margin">
-        <ul>
-            <li>看看Email地址有没有写错</li>
-            <li>看看是否在垃圾邮箱里</li>
-<!--            <li>点此<a href="/activate/email/resend?email={{$email}}">重新发送验证邮件</a></li>-->
-        </ul>
-    </div>  
 </div>
 @stop

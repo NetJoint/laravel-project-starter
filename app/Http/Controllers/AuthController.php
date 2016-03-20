@@ -17,7 +17,6 @@ use App\Http\Requests\AuthActivateRequest;
 //use App\Http\Requests\AuthEmailResetRequest;
 //use App\Http\Requests\AuthEmailBindRequest;
 //use App\Http\Requests\AuthEmailResetCompleteRequest;
-
 //use App\Http\Requests\AuthActivateClubRequest;
 //use App\Http\Requests\AuthMobileRegisterRequest;
 //use App\Http\Requests\AuthMobileVerifyRequest;
@@ -49,7 +48,7 @@ class AuthController extends Controller
         $remember = (bool) $request->input('remember_me', false);
         try {
             if (Sentinel::authenticate($credentials, $remember)) {
-                    return redirect('/');
+                return redirect('/');
             }
             $error = '用户名或密码错误。';
         } catch (NotActivatedException $e) {
@@ -79,28 +78,50 @@ class AuthController extends Controller
 
     public function postRegisterEmail(AuthRegisterEmailRequest $request)
     {
-        $credentials = array_only($request->all(), ['email']);
-        $credentials['password'] = substr(md5(uniqid()), 0, 12);
-
-        try {
-            //注册用户
+        $email = $request->input('email');
+        $credentials = [
+            'email' => $email,
+        ];
+        # 查找邮件地址是否已经注册
+        $user = Sentinel::findByCredentials($credentials);
+        if ($user) {
+            # 用户已存在
+            if (Activation::completed($user)) {
+                # 用户已激活
+                $errors = ['email' => '该邮箱已激活，您可以 <a href="/login">登录</a> 或 <a href="/reset?email=' . $email . '">重置密码</a>'];
+                return redirect()->back()->withInput()->withErrors($errors);
+            }
+            # 未激活则重发验证邮件
+            Activation::removeExpired();
+            $activation = Activation::exists($user);
+            if (!$activation) {
+                # 激活码过期了，生成新的
+                $activation = Activation::create($user);
+            }
+        } else {
+            # 用户不存在，添加新用户
+            $credentials = [
+                'email' => $email,
+                'password' => substr(md5(uniqid()), 0, 12)
+            ];
             $user = Sentinel::register($credentials);
-            //生成激活码
             $activation = Activation::create($user);
-
-            //在这里发送邮件
+        }
+        try {
+            # 发送激活邮件
             Mail::send('emails.activation', ['user' => $user, 'activation' => $activation], function ($mail) use ($user) {
                 $mail->from(env('MAIL_FROM_ADDRESS'), sitename());
                 $mail->to($user['email']);
                 $mail->subject('欢迎您加入' . sitename());
             });
-
             return view('auth.register_email_send')->with('email', $user['email']);
         } catch (Exception $e) {
-            return redirect()->back()->withInput();
+            # 出错可能是发送参数设置不正确，请检查.env文件邮件配置
+            $errors = ['email' => '邮件发送失败，请稍后再试'];
+            return redirect()->back()->withInput()->withErrors($errors);
         }
     }
-    
+
     public function getActivateEmailResend(Request $request)
     {
         $email = $request->input('email');
@@ -109,34 +130,38 @@ class AuthController extends Controller
 
     public function postActivateEmailResend(AuthActivateEmailResendRequest $request)
     {
+        $email = $request->input('email');
         $credentials = [
-            'email' => $request->input('email')
+            'email' => $email,
         ];
-        //用户已注册
-        if ($user = Sentinel::findByCredentials($credentials)) {
-            if (Activation::completed($user)) {
-            //如果用户已经激活，提示提示已经激活，跳转到登录页面
-                $errors = ['msg' => '您的账户已经激活，请登录！'];
-                return redirect()->route('login')->withErrors($errors);
-            } else {
-                Activation::removeExpired();
-                $activation = Activation::exists($user);
-                if (!$activation) {
-                    //过期了
-                    $activation = Activation::create($user);
-                }
-                //在这里发送邮件
-                Mail::send('emails.activation', ['user' => $user, 'activation' => $activation], function ($mail) use ($user) {
-                    $mail->from(env('MAIL_FROM_ADDRESS'), sitename());
-                    $mail->to($user['email']);
-                    $mail->subject('欢迎您加入' . sitename());
-                });
-                return view('auth.register_email_send')->with('email', $user['email']);
-            }
-        } else {//如果用户未注册，提示请注册，并跳转到注册页面
-            $errors = ['email' => '您的邮箱未注册，请注册！'];
-            return redirect()->route('register')->withErrors($errors);
+        # 查找邮件地址注册的用户，用户不存在的情况已在AuthActivateEmailResendRequest排除
+        $user = Sentinel::findByCredentials($credentials);
+        # 用户不存在情况已在
+        if (Activation::completed($user)) {
+            # 用户已激活
+            $errors = ['email' => '该邮箱已激活，您可以 <a href="/login">登录</a> 或 <a href="/reset?email=' . $email . '">重置密码</a>'];
+            return redirect()->back()->withInput()->withErrors($errors);
         }
+        # 未激活则重发验证邮件
+        Activation::removeExpired();
+        $activation = Activation::exists($user);
+        if (!$activation) {
+            # 激活码过期了，生成新的
+            $activation = Activation::create($user);
+        }
+        try {
+            # 发送激活邮件
+            Mail::send('emails.activation', ['user' => $user, 'activation' => $activation], function ($mail) use ($user) {
+                $mail->from(env('MAIL_FROM_ADDRESS'), sitename());
+                $mail->to($user['email']);
+                $mail->subject('欢迎您加入' . sitename());
+            });
+            return view('auth.register_email_send')->with('email', $user['email']);
+        } catch (Exception $e) {
+            # 出错可能是发送参数设置不正确，请检查.env文件邮件配置
+            $errors = ['email' => '邮件发送失败，请稍后再试'];
+            return redirect()->back()->withInput()->withErrors($errors);
+        }        
     }
 
     public function getActivateEmail($userId, $code)
@@ -155,7 +180,7 @@ class AuthController extends Controller
             return redirect('register')->withErrors($errors);
         }
     }
-    
+
     public function postActivate(AuthActivateRequest $request)
     {
         //移除过期的激活码
@@ -184,9 +209,6 @@ class AuthController extends Controller
     {
         return view('auth.activate_success');
     }
-    
-    
-    
 
     public function getReset(Request $request)
     {

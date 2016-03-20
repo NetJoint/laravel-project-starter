@@ -7,11 +7,11 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('/', 'WelcomeController@index');
     # 注册页
     Route::get('register', 'AuthController@getRegister');
-    # 邮件注册流程
-    Route::post('register/email', 'AuthController@postRegisterEmail');
+    # 邮件注册，csrf防止跨站脚本攻击
+    Route::post('register/email', ['middleware' => 'csrf','uses' => 'AuthController@postRegisterEmail']);
     # 重发激活邮件
     Route::get('activate/email/resend', 'AuthController@getActivateEmailResend');
-    Route::post('activate/email/resend', 'AuthController@postActivateEmailResend');
+    Route::post('activate/email/resend', ['middleware' => 'csrf','uses' => 'AuthController@postActivateEmailResend']);
     # 账号激活
     Route::get('activate/email/{id}/{activationCode}', 'AuthController@getActivateEmail');
     Route::post('activate', 'AuthController@postActivate');

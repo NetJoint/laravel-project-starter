@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Dingo\Api\Http\Response;
 use Dingo\Api\Routing\Router;
 use Dingo\Api\Http\RateLimit\Handler;
 
