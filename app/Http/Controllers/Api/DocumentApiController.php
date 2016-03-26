@@ -100,6 +100,8 @@ class DocumentApiController extends ApiController
         }
         if ($count) {
             $message = "修改了{$count}个文档";           
+        }else{
+            $message = "没有修改文档";
         }
         return $this->response->array(['message' => $message]);
     }
@@ -115,8 +117,7 @@ class DocumentApiController extends ApiController
             $count = Document::whereIn('id', $ids)->delete();
         }
         if ($count) {
-            $message = "删除了{$count}个文档";
-            operation_log($request, $message . ': #' . $id);
+            $message = "删除了{$count}个文档";           
         } else {
             $message = "没有删除文档";
         }
