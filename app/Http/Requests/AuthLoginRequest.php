@@ -40,7 +40,9 @@ class AuthLoginRequest extends FormRequest
 
     public function messages()
     {        
-        return [];
+        return [
+            
+        ];
     }
 
 }

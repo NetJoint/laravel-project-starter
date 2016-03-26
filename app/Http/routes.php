@@ -13,9 +13,15 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('activate/email/resend', 'AuthController@getActivateEmailResend');
     Route::post('activate/email/resend', ['middleware' => 'csrf','uses' => 'AuthController@postActivateEmailResend']);
     # 账号激活
-    Route::get('activate/email/{id}/{activationCode}', 'AuthController@getActivateEmail');
+    Route::get('activate/email/{user_id}/{activationCode}', 'AuthController@getActivateEmail');
     Route::post('activate', 'AuthController@postActivate');
     Route::get('activate/success', 'AuthController@getActivateSuccess');
+    # 重置密码
+    Route::get('reset', 'AuthController@getReset');
+    Route::post('reset/email', 'AuthController@postEmailReset');
+    Route::get('reset/email/{userId}/{remindCode}', 'AuthController@getEmailResetComplete');
+    Route::post('reset/email/complete', 'AuthController@postEmailResetComplete');
+    Route::get('reset/success', 'AuthController@getResetSuccess');
 
     # 登录
     Route::get('login', 'AuthController@getLogin');
@@ -39,14 +45,25 @@ Route::group(['middleware' => ['web']], function () {
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) {
     $api->group(['namespace' => 'App\Http\Controllers\Api'], function ($api) {
-
-
+        # 公开API       
+        # 登录
+        $api->post('auth/login', ['middleware' => 'throttle:10,5', 'uses' => 'AuthApiController@login']);
+        
         $api->group(['middleware' => ['role:user']], function ($api) {
             # 普通用户可用API
         });
 
         $api->group(['middleware' => ['role:admin']], function ($api) {
             # 管理员可用API
+            # Document
+            $api->get('document', ['uses' => 'DocumentApiController@getList']);
+            $api->get('document/typeahead', ['uses' => 'DocumentApiController@typeahead']);
+            $api->get('document/{id}', ['uses' => 'DocumentApiController@getDetail']);
+            $api->post('document', ['uses' => 'DocumentApiController@store']);
+            $api->post('document/import', ['uses' => 'DocumentApiController@import']);
+            $api->put('document/{id}', ['uses' => 'DocumentApiController@update']);
+            $api->delete('document/{id}', ['uses' => 'DocumentApiController@destroy']);
+            
         });
     });
 });

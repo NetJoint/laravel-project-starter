@@ -79,9 +79,7 @@ class AuthController extends Controller
     public function postRegisterEmail(AuthRegisterEmailRequest $request)
     {
         $email = $request->input('email');
-        $credentials = [
-            'email' => $email,
-        ];
+        $credentials = compact('email');
         # 查找邮件地址是否已经注册
         $user = Sentinel::findByCredentials($credentials);
         if ($user) {
@@ -109,12 +107,12 @@ class AuthController extends Controller
         }
         try {
             # 发送激活邮件
-            Mail::send('emails.activation', ['user' => $user, 'activation' => $activation], function ($mail) use ($user) {
+            Mail::send('emails.activation', ['user' => $user, 'activation' => $activation], function ($mail) use ($email) {
                 $mail->from(env('MAIL_FROM_ADDRESS'), sitename());
-                $mail->to($user['email']);
+                $mail->to($email);
                 $mail->subject('欢迎您加入' . sitename());
             });
-            return view('auth.register_email_send')->with('email', $user['email']);
+            return view('auth.register_email_send', compact('email'));
         } catch (Exception $e) {
             # 出错可能是发送参数设置不正确，请检查.env文件邮件配置
             $errors = ['email' => '邮件发送失败，请稍后再试'];
@@ -125,15 +123,13 @@ class AuthController extends Controller
     public function getActivateEmailResend(Request $request)
     {
         $email = $request->input('email');
-        return view('auth.activate_email_resend')->with('email', $email);
+        return view('auth.activate_email_resend', compact('email'));
     }
 
     public function postActivateEmailResend(AuthActivateEmailResendRequest $request)
     {
         $email = $request->input('email');
-        $credentials = [
-            'email' => $email,
-        ];
+        $credentials = compact('email');
         # 查找邮件地址注册的用户，用户不存在的情况已在AuthActivateEmailResendRequest排除
         $user = Sentinel::findByCredentials($credentials);
         # 用户不存在情况已在
@@ -156,12 +152,12 @@ class AuthController extends Controller
                 $mail->to($user['email']);
                 $mail->subject('欢迎您加入' . sitename());
             });
-            return view('auth.register_email_send')->with('email', $user['email']);
+            return view('auth.register_email_send', compact('email'));
         } catch (Exception $e) {
             # 出错可能是发送参数设置不正确，请检查.env文件邮件配置
             $errors = ['email' => '邮件发送失败，请稍后再试'];
             return redirect()->back()->withInput()->withErrors($errors);
-        }        
+        }
     }
 
     public function getActivateEmail($userId, $code)
@@ -213,26 +209,25 @@ class AuthController extends Controller
     public function getReset(Request $request)
     {
         $email = $request->input('email', '');
-        $mobile = $request->input('mobile', '');
-        return view('auth.reset')->with(compact('email', 'mobile'));
+        return view('auth.reset', compact('email'));
     }
 
     public function postEmailReset(EmailResetRequest $request)
     {
-        //删除过期数据
+        $email = $request->input('email');
+        //删除过期数据        
         Reminder::removeExpired();
-        $credentials = [
-            'email' => $request->input('email')
-        ];
-        if ($user = Sentinel::findByCredentials($credentials)) {
+        $credentials = compact('email');
+        $user = Sentinel::findByCredentials($credentials);
+        if ($user) {
             $reminder = Reminder::create($user);
             //在这里发送邮件
-            Mail::send('auth/emails.reset', ['user' => $user, 'reminder' => $reminder], function ($mail) use ($user) {
+            Mail::send('auth/emails.reset', ['user' => $user, 'reminder' => $reminder], function ($mail) use ($email) {
                 $mail->from(env('MAIL_FROM_ADDRESS'), sitename());
-                $mail->to($user['email']);
+                $mail->to($email);
                 $mail->subject('重置' . sitename() . '密码');
             });
-            return view('auth.reset_email_send')->with('email', $user['email']);
+            return view('auth.reset_email_send', compact('email'));
         } else {//如果用户不存在，提示注册
             $errors = ['email' => '您的邮箱未注册，请注册！'];
             return redirect()->route('register')->withErrors($errors);
@@ -259,155 +254,9 @@ class AuthController extends Controller
             return redirect()->route('reset')->withErrors($errors);
         }
     }
-
-    public function getEmailBindVerify($userId, $code)
+    
+    public function getResetSuccess()
     {
-        $email = \Input::get('email');
-        $user = Sentinel::findById($userId);
-        if (!$user) {
-            return \Response::view('errors.404', array(), 404);
-        }
-        return view('auth.email_bind_verify', ['user' => $user, 'user_id' => $userId, 'code' => $code, 'email' => $email]);
+        return view('auth.reset_success');
     }
-
-    public function postEmailBindVerify(EmailBindRequest $request)
-    {
-        $user_id = $request->input('user_id');
-        $user = Sentinel::findById($user_id);
-        if (!$user) {
-            $errors = array('email' => '用户不存在');
-            return redirect()->back()->withInput()->withErrors($errors);
-        }
-        $email = $request->input('email');
-        if ($user->binding_email !== $email) {
-            $errors = array('email' => '该用户未申请绑定该邮箱');
-            return redirect()->back()->withInput()->withErrors($errors);
-        }
-        if ($user->email !== null) {
-            $errors = array('email' => '用户已经绑定其他邮箱了');
-            return redirect()->back()->withInput()->withErrors($errors);
-        }
-        Reminder::removeExpired();
-        $reminder = Reminder::exists($user);
-        if (!$reminder) {
-            $errors = array('email' => '邮箱绑定码错误或已过期，请重新申请');
-            return redirect()->back()->withInput()->withErrors($errors);
-        }
-        $user->email = $email;
-        $user->save();
-        return view('auth.email_bind_verify_success', ['user' => $user, 'email' => $email]);
-    }
-
-    //mobile register:
-
-    public function getMobileRegister($mobile)
-    {
-        return view('auth.register_mobile')->with('mobile', $mobile);
-    }
-
-    public function postMobileRegister(MobileRegisterRequest $request)
-    {
-        $credentials = array_only($request->all(), ['mobile']);
-        $credentials['password'] = substr(md5(uniqid()), 0, 12);
-
-        //注册用户
-        $user = Sentinel::register($credentials);
-        //生成激活码
-        $activation = MobileActivation::create($user);
-        return redirect('/register/mobile/' . $user['mobile']);
-    }
-
-    public function getResendMobileActivationCode(Request $request)
-    {
-        $validator = \Validator::make($request->all(), [
-                    'mobile' => 'required|digits:11',
-        ]);
-        if ($validator->fails()) {
-            $errors = array('mobile' => '请填写正确的手机号码');
-            return redirect()->back()->withInput()->withErrors($errors);
-        }
-        $mobile = $request->input('mobile');
-        return view('auth.register_mobile')->with('mobile', $mobile);
-    }
-
-    public function getMobileReset($mobile)
-    {
-        return view('auth.reset_mobile')->with('mobile', $mobile);
-    }
-
-    public function postMobileReset(MobileResetRequest $request)
-    {
-        MobileReminder::removeExpired();
-        $credentials = array_only($request->all(), ['mobile']);
-        $user = Sentinel::findByCredentials($credentials);
-        MobileReminder::create($user);
-        return redirect('/reset/mobile/' . $user['mobile']);
-    }
-
-    public function postMobileResetVerify(MobileVerifyRequest $request)
-    {
-        MobileReminder::removeExpired();
-        $credentials = array_only($request->all(), ['mobile']);
-        $user = Sentinel::findByCredentials($credentials);
-        $reminder = MobileReminder::exists($user);
-        if (!$reminder) {
-            //过期了
-            $reminder = MobileReminder::create($user);
-            $errors = array('code' => '手机验证码已过期，请重新发送');
-            return redirect()->back()->withInput()->withErrors($errors);
-        } else {
-            $code = $request->input('code');
-            if ($code == $reminder['code']) {
-                return view('auth.set_password', ['userid' => $user['id'], 'code' => $code]);
-            } else {
-                $errors = array('code' => '手机验证码不正确');
-                return redirect()->back()->withInput()->withErrors($errors);
-            }
-        }
-    }
-
-    public function postActivateMobileVerify(MobileVerifyRequest $request)
-    {
-        Activation::removeExpired();
-        $credentials = [
-            'login' => $request->input('mobile'),
-        ];
-        $user = Sentinel::findByCredentials($credentials);
-        if (!$user) {
-            $errors = array('code' => '手机号码未注册');
-            return redirect()->back()->withInput()->withErrors($errors);
-        }
-        $activation = Activation::exists($user);
-        if (!$activation) {
-            //过期了
-            $activation = MobileActivation::create($user);
-            $errors = array('code' => '手机验证码已过期，请重新发送');
-            return redirect()->back()->withInput()->withErrors($errors);
-        } else {
-            if ($request->input('code') == $activation['code']) {
-                return redirect("/activate/mobile/{$user['id']}/{$activation['code']}");
-            } else {
-                $errors = array('code' => '手机验证码不正确');
-                return redirect()->back()->withInput()->withErrors($errors);
-            }
-        }
-    }
-
-    public function getMobileActivate($userId, $code)
-    {
-        $user = Sentinel::findById((int) $userId);
-        if ($user) {
-            if (Activation::completed($user)) {//如果用户已经激活，提示提示已经激活，跳转到登录页面
-                $errors = ['msg' => '您的账户已经激活，请登录！'];
-                return redirect()->route('login')->withErrors($errors);
-            } else {
-                //设置初始密码
-                return view('auth.init_password', ['userid' => $userId, 'code' => $code]);
-            }
-        } else {//如果用户未注册，提示请注册，并跳转到注册页面   
-            $errors = ['email' => '您的邮箱未注册，请注册！'];
-            return redirect()->route('register')->withErrors($errors);
-        }
-    }
-
 }
