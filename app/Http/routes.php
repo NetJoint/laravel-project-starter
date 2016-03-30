@@ -52,16 +52,22 @@ $api->version('v1', function ($api) {
         $api->group(['middleware' => ['role:user']], function ($api) {
             # 普通用户可用API
         });
-
         $api->group(['middleware' => ['role:admin']], function ($api) {
             # 管理员可用API
             # Document
+              # 列表及搜索
             $api->get('document', ['uses' => 'DocumentApiController@getList']);
+              # 提示
             $api->get('document/typeahead', ['uses' => 'DocumentApiController@typeahead']);
+              # 详情
             $api->get('document/{id}', ['uses' => 'DocumentApiController@getDetail']);
+              # 创建
             $api->post('document', ['uses' => 'DocumentApiController@store']);
+              # 批量导入
             $api->post('document/import', ['uses' => 'DocumentApiController@import']);
+              # 修改
             $api->put('document/{id}', ['uses' => 'DocumentApiController@update']);
+              # 删除
             $api->delete('document/{id}', ['uses' => 'DocumentApiController@destroy']);
             
         });
