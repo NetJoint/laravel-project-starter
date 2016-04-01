@@ -47,6 +47,7 @@ class Kernel extends HttpKernel
         'csrf' => \App\Http\Middleware\VerifyCsrfToken::class,
         'auth' => \App\Http\Middleware\Authenticate::class,
         'role' => \App\Http\Middleware\Role::class,
-        'throttle' => \App\Http\Middleware\Throttle::class
+        'throttle' => \App\Http\Middleware\Throttle::class,
+        'internal' => \App\Http\Middleware\Internal::class,
     ];
 }
