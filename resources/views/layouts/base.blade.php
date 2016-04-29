@@ -34,7 +34,6 @@
         <![endif]-->
         @yield("body")
         <script src="/lib/bootstrap2-sui/js/bootstrap2-sui.min.js"></script>
-        @yield("script")
-        <script src="/js/website.js"></script>        
+        @yield("script")     
     </body>
 </html>
