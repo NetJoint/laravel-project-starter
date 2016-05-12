@@ -67,9 +67,9 @@ class UserApiController extends ApiController
             $ids = explode(',', $id);
             $count = User::processUpdateRequest($request, [['id', 'in', $ids]]);
         }
-        if($count){
+        if ($count) {
             $message = "修改了{$count}个用户信息";
-        }else{
+        } else {
             $message = "未修改用户信息";
         }
         return $this->response->array(['message' => $message]);
@@ -86,21 +86,21 @@ class UserApiController extends ApiController
         }
         return $this->response->array(['message' => "{$count}条数据已删除"]);
     }
-    
+
     public function getRole(Request $request, $user_id)
     {
         $user = User::find($user_id);
         $items = $user->roles;
         return $this->response->collection($items, new RoleTransformer);
     }
-    
+
     public function postRole(UserRoleRequest $request)
     {
         $role_id = $request->input('role_id');
-        if(!$role_id){
+        if (!$role_id) {
             $slug = $request->input('slug');
-            $role = Role::where('slug' , $slug)->first();
-        }else{
+            $role = Role::where('slug', $slug)->first();
+        } else {
             $role = Role::find($role_id);
         }
         if (!$role) {
@@ -109,7 +109,7 @@ class UserApiController extends ApiController
         $user_id = (int) $request->input('user_id');
         $user = User::find($user_id);
         $exist = $user->roles()->find($role_id);
-        if($exist){
+        if ($exist) {
             return $this->response->array(['message' => '用户已有该角色']);
         }
         $user->roles()->attach($role_id);
@@ -117,4 +117,17 @@ class UserApiController extends ApiController
         return $this->response->array(['message' => $message]);
     }
 
+    public function deleteRole($user_id, $role_id)
+    {
+        $user = User::find($user_id);
+        $role = Role::find($role_id);
+        $exist = $user->roles()->find($role_id);
+        if (!$exist) {
+            return $this->response->array(['message' => '用户没有该角色']);
+        }
+        $user->roles()->detach($role_id);
+        $message = "给用户【{$user->name}#{$user->id}】移除角色【{$role->name}】";
+        return $this->response->array(['message' => $message]);
+    }
+    
 }

@@ -20,7 +20,7 @@ class UserTransformer extends TransformerAbstract
             'mobile' => $item->mobile,
             'last_login' => (string) $item->last_login,
             'created_at' => (string) $item->created_at,
-            'roles'=> $item->roles->pluck('name','slug')->toArray()
+            'roles'=> $item->roles->pluck('name')->toArray()
         ];
     }
 

@@ -24,6 +24,8 @@
         </div>
         @endif
         <form class="form validate" method="post" action="/login">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="jump" value="{{ $jump }}">
             <div class="control-group">
                 <div class="controls">
                     <div class="input-control control-right">

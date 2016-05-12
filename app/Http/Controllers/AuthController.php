@@ -25,12 +25,20 @@ use App\Http\Requests\AuthActivateRequest;
 class AuthController extends Controller
 {
 
-    public function getLogin()
+    public function getLogin(Request $request)
     {
+        $jump = $request->input('jump','');
         if (Sentinel::guest()) {
-            return view('auth.login');
+            return view('auth.login',['jump' => $jump]);
         } else {
-            return redirect('/');
+            $user = Sentinel::getUser();
+            if ($user->hasRole('admin')) {
+                # 用户为管理员则跳转到管理中心
+                return redirect('/manage');
+            } else {
+                # 普通用户跳转到用户中心
+                return redirect('/home');
+            }
         }
     }
 
@@ -39,6 +47,8 @@ class AuthController extends Controller
         $credentials = [
             'password' => $request->input('password'),
         ];
+        
+        $jump = $request->input('jump','');
 
         if (is_numeric($request->input('login'))) {
             $credentials['mobile'] = $request->input('login');
@@ -48,7 +58,17 @@ class AuthController extends Controller
         $remember = (bool) $request->input('remember_me', false);
         try {
             if (Sentinel::authenticate($credentials, $remember)) {
-                return redirect('/');
+                if($jump){
+                    return redirect($jump);
+                }
+                $user = Sentinel::getUser();
+                if ($user->hasRole('admin')) {
+                    # 用户为管理员则跳转到管理中心
+                    return redirect('/manage');
+                } else {
+                    # 普通用户跳转到用户中心
+                    return redirect('/home');
+                }
             }
             $error = '用户名或密码错误。';
         } catch (NotActivatedException $e) {
@@ -254,9 +274,10 @@ class AuthController extends Controller
             return redirect()->route('reset')->withErrors($errors);
         }
     }
-    
+
     public function getResetSuccess()
     {
         return view('auth.reset_success');
     }
+
 }

@@ -13,10 +13,10 @@
         @show
         @section('description')
             <meta name="description" content="">
-        @show
-        @yield("css")
+        @show        
         <link href="/lib/bootstrap2-sui/css/bootstrap2-sui.css" rel="stylesheet">
         <link href="/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+        @yield("css")
         <link href="/css/website.css" rel="stylesheet">
         @yield("style")
         <!--[if lte IE 9]>
