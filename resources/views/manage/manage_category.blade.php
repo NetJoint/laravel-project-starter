@@ -48,15 +48,19 @@
 @section('body')
 @include('globals/nav')
 <div class="container">
-      
-    <div class="box box-info">
-        <div class="box-header with-border">
-            <h3 class="box-title">栏目管理</h3>
-            <div class="box-tools pull-right">
-                <button data-widget="collapse" class="btn btn-box-tool"><i class="fa fa-minus"></i></button>
-            </div>
+    
+    <div class="layout">
+        <div class="sidebar">
+            <ul class="nav nav-xlarge nav-list">
+                <li><a href="/manage">首页</a></li>                
+                <li class="active"><a >栏目管理</a></li>
+                <li><a href="/manage/document">文章管理</a></li>
+                <li><a href="/manage/user">用户管理</a></li>
+            </ul>
         </div>
-        <div class="box-body box-table" data-url="/api/category">
+        <div class="content">
+            <h3>栏目管理</h3>
+             <div class="box-body box-table" data-url="/api/category">
             <div id="catToolbar">
                 <button class="btn btn-success btn-large btn-create" type="button" data-target="#categoryCreateModal" data-width="large" ><i class="fa fa-plus-circle"></i> 添加</button>
                 <button class="btn btn-danger btn-large btn-delete btn-select-enable" type="button" disabled><i class="fa fa-remove"></i> 删除</button>
@@ -87,16 +91,19 @@
                         <th data-field="id" data-sortable="true">ID</th>
                         <th data-field="title" data-editable="true" >名称</th>
                         <th data-field="link" data-formatter="linkFormatter" data-searchable="false">页面地址</th>
-                        <th data-field="list_template" data-formatter="templateFormatter" data-searchable="false">列表模板</th>
-                        <th data-field="limit" data-searchable="false"  data-formatter="limitFormatter">列表条数</th>                     
-                        <th data-field="doc_count" data-searchable="false"  data-formatter="documentFormatter">文档数</th>                     
+                        <th data-field="list_template" data-editable="true" data-searchable="false">列表模板</th> 
+                        <th data-field="detail_template" data-editable="true" data-searchable="false">文章模板</th>
+                        <th data-field="parent_category" data-searchable="false">上级栏目</th>
+                        <th data-field="children_category" data-searchable="false">子栏目</th>
+                        <th data-field="doc_count" data-searchable="false"  data-formatter="documentFormatter">文档数</th>         
                         <th data-field="created_at">添加日期</th>
                         <th data-align="center" data-formatter="categoryActions" data-searchable="false" data-width="100">操作</th>
                     </tr>
                 </thead>                
             </table>
-        </div>                
-    </div>    
+        </div>          
+        </div>
+    </div> 
 </div>
 @include('modals.modal_create',['modal'=>['name'=>'category', 'title'=>'栏目', 'api'=>'/api/category'],'inputs'=>'inputs.category_create'])
 @include('modals.modal_edit',['modal'=>['name'=>'category', 'title'=>'栏目', 'api'=>'/api/category'],'inputs'=>'inputs.category_edit'])

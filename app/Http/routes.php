@@ -28,6 +28,10 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('login', 'AuthController@postLogin');
     # 退出
     Route::get('logout', 'AuthController@getLogout');
+    
+    
+    # 文章内容页
+    Route::get('/document/{hash}', 'DocumentController@getDetail');
 
 
     # 普通用户可见页面
@@ -62,6 +66,26 @@ $api->version('v1', function ($api) {
         });
         $api->group(['middleware' => ['role:admin']], function ($api) {
             # 管理员可用API
+            
+            # Category
+            # 列表及搜索
+            $api->get('category', ['uses' => 'CategoryApiController@getList']);
+            # 提示
+            $api->get('category/typeahead', ['uses' => 'CategoryApiController@typeahead']);
+            # 详情
+            $api->get('category/{id}', ['uses' => 'CategoryApiController@getDetail']);
+            # 创建
+            $api->post('category', ['uses' => 'CategoryApiController@store']);
+            # 批量导入
+            $api->post('category/import', ['uses' => 'CategoryApiController@import']);
+            # 修改
+            $api->put('category/{id}', ['uses' => 'CategoryApiController@update']);
+            # 删除
+            $api->delete('category/{id}', ['uses' => 'CategoryApiController@destroy']);
+            
+            # 栏目文章
+            $api->get('category/{id}/document', ['uses' => 'CategoryApiController@getDocument']);
+            $api->delete('category/{category_id}/document/{document_id}', ['uses' => 'CategoryApiController@deleteDocument']);
             
             # Document
             # 列表及搜索
@@ -101,7 +125,11 @@ $api->version('v1', function ($api) {
             # 角色列表
             $api->get('role', ['uses' => 'RoleApiController@getList']);
             # 角色提示
-            $api->get('role/typeahead', ['uses' => 'RoleApiController@typeahead']);            
+            $api->get('role/typeahead', ['uses' => 'RoleApiController@typeahead']);   
+            
+            #ueditor编辑器
+            $api->get('ueditor', ['uses' => 'UeditorApiController@index']);
+            $api->post('ueditor', ['uses' => 'UeditorApiController@postFile']);
             
         });
     });

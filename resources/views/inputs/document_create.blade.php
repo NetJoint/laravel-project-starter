@@ -4,7 +4,6 @@
 <script src="/lib/bootstrap2-sui/editor/editor-all.min.js"></script>
 <script src="/lib/cropper/cropper.min.js"></script>
 <script src="/lib/cropupload/cropupload.js"></script>
-<input name="feed_id" type="hidden" value="">
 <div class="control-group">
     <label class="control-label"><b class="text-danger">*</b>标题：</label>
     <div class="controls">
@@ -12,11 +11,18 @@
     </div>
 </div>
 <div class="control-group">
+    <label class="control-label"><b class="text-danger">*</b>栏目：</label>
+    <div class="controls">
+        <input id="categoryTypeahead" type="text" placeholder="搜索栏目名称或id" value="" autocomplete="off">
+        <input name="category_id" type="hidden" value="" data-rules="required">
+    </div>
+</div>
+<!--<div class="control-group">
     <label class="control-label"><b class="text-danger">*</b>发布日期：</label>
     <div class="controls">
         <input name="publish_date" data-toggle="datepicker" value="{{date('Y-m-d')}}" type="text" data-rules="required"  class="input-medium">        
     </div>
-</div>
+</div>-->
 <div class="control-group">
     <label class="control-label">链接地址：</label>
     <div class="controls">
@@ -48,3 +54,16 @@
         <input name="rank" placeholder="数字越大越靠前，默认为0" type="text" class="input-large">
     </div>
 </div>
+@section('script')
+<script>  
+$('#documentCreateForm #categoryTypeahead').autocomplete({
+        serviceUrl: '/api/category/typeahead',
+        params: {
+            limit: 5
+        },
+        onSelect: function (suggestion) {
+            $('#documentCreateForm input[name="category_id"]').val(suggestion.data.id);
+        }
+    });
+</script>
+@append

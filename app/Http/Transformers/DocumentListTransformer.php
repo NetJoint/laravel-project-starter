@@ -19,7 +19,8 @@ class DocumentListTransformer extends TransformerAbstract
             'description' => $item->description,
             'thumb' => $item->thumb,
             'link' => $item->link,
-            'publisher' => $item->publisher->name,           
+            'publisher' => $item->publisher->name,
+            'category'=> $item->category->title,
             'rank' => $item->rank,
             'created_at' => (string) $item->created_at,
             'updated_at' => (string) $item->updated_at

@@ -13,24 +13,6 @@
     function linkFormatter(value, row) {
         return '<a href="' + value + '" target="_blank">' + value + '</a>';
     }
-    function feedsFormatter(value, row) {
-        if (value == '') {
-            value = '未添加';
-            var cls = 'text-danger';
-        } else {
-            var cls = 'text-success';
-        }
-        return '<a data-target="#feedRelationModal" data-master="document" data-slave="feed" class="btn-relation editable-click ' + cls + '" href="javascript:void(0);" ref="' + row.id + '">' + value + '</a>';
-    }
-    function categoriesFormatter(value, row) {
-        if (value == '') {
-            value = '未添加';
-            var cls = 'text-danger';
-        } else {
-            var cls = 'text-success';
-        }
-        return '<a data-target="#categoryRelationModal" data-master="document" data-slave="category" class="btn-relation editable-click ' + cls + '" href="javascript:void(0);" ref="' + row.id + '">' + value + '</a>';
-    }
     function docActions(value, row) {
         var actions = '<button data-target="#documentEditModal" ref="' + row.id + '" class="btn btn-success btn-edit">修改</button>';
         return actions;
@@ -83,7 +65,7 @@
                         <th data-field="id" data-sortable="true">ID</th>
                         <th data-field="title" data-editable="true" >标题</th>
                         <th data-field="link" data-formatter="linkFormatter">页面地址</th>
-                        <th data-field="categories" data-searchable="false" data-formatter="categoriesFormatter">栏目</th>
+                        <th data-field="category" data-searchable="false">栏目</th>
                         <th data-field="publisher" data-searchable="false">发布用户</th>
                         <th data-field="publish_date">发布日期</th>
                         <th data-field="created_at">添加日期</th>

@@ -4,14 +4,15 @@ namespace App\Http\Requests;
 
 use Dingo\Api\Http\FormRequest;
 
-class DocumentCreateRequest extends FormRequest
+class CategoryCreateRequest extends FormRequest
 {
 
     public function rules()
     {
         return [
             'title' => 'required',
-            'category_id' => 'required',
+            'list_template' => 'required',
+            'detail_template' => 'required'
         ];
     }
     
@@ -23,6 +24,7 @@ class DocumentCreateRequest extends FormRequest
     public function messages()
     {
         return [
+            
         ];
     }
 
