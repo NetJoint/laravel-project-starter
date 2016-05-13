@@ -3,7 +3,6 @@
 <title>栏目管理 - 管理中心</title>
 @stop
 @section('css')
-
 <link type="text/css" rel="stylesheet" href="/lib/bootstrap-table/bootstrap-table.min.css">
 <link type="text/css" rel="stylesheet" href="/lib/bootstrap-editable/css/bootstrap-editable.css">
 @stop

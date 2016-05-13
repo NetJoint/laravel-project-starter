@@ -29,6 +29,8 @@ Route::group(['middleware' => ['web']], function () {
     # 退出
     Route::get('logout', 'AuthController@getLogout');
     
+    # 栏目文章列表页
+    Route::get('/category/{id}', 'CategoryController@getDetail');
     
     # 文章内容页
     Route::get('/document/{hash}', 'DocumentController@getDetail');
@@ -67,7 +69,7 @@ $api->version('v1', function ($api) {
         $api->group(['middleware' => ['role:admin']], function ($api) {
             # 管理员可用API
             
-            # Category
+            # 栏目Category
             # 列表及搜索
             $api->get('category', ['uses' => 'CategoryApiController@getList']);
             # 提示
@@ -76,18 +78,18 @@ $api->version('v1', function ($api) {
             $api->get('category/{id}', ['uses' => 'CategoryApiController@getDetail']);
             # 创建
             $api->post('category', ['uses' => 'CategoryApiController@store']);
-            # 批量导入
-            $api->post('category/import', ['uses' => 'CategoryApiController@import']);
             # 修改
             $api->put('category/{id}', ['uses' => 'CategoryApiController@update']);
             # 删除
             $api->delete('category/{id}', ['uses' => 'CategoryApiController@destroy']);
             
-            # 栏目文章
+            # 栏目下的文章
+            # 列表
             $api->get('category/{id}/document', ['uses' => 'CategoryApiController@getDocument']);
+            # 删除文章
             $api->delete('category/{category_id}/document/{document_id}', ['uses' => 'CategoryApiController@deleteDocument']);
             
-            # Document
+            # 文章Document
             # 列表及搜索
             $api->get('document', ['uses' => 'DocumentApiController@getList']);
             # 提示
@@ -103,7 +105,7 @@ $api->version('v1', function ($api) {
             # 删除
             $api->delete('document/{id}', ['uses' => 'DocumentApiController@destroy']);
             
-            # User
+            # 用户User
             # 列表及搜索
             $api->get('user', ['uses' => 'UserApiController@getList']);
             # 提示
@@ -116,12 +118,14 @@ $api->version('v1', function ($api) {
             $api->put('user/{id}', ['uses' => 'UserApiController@update']);
             # 删除
             $api->delete('user/{id}', ['uses' => 'UserApiController@destroy']);
+            
             # 角色列表
-            $api->get('user/{id}/role', ['uses' => 'UserApiController@getRole']);
+            $api->get('user/{id}/role', ['uses' => 'UserApiController@getRole']);            
             # 添加角色
             $api->post('user/role', ['uses' => 'UserApiController@postRole']);
             # 删除角色
             $api->delete('user/{user_id}/role/{role_id}', ['uses' => 'UserApiController@deleteRole']);
+            
             # 角色列表
             $api->get('role', ['uses' => 'RoleApiController@getList']);
             # 角色提示

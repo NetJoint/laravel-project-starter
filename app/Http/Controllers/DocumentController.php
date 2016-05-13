@@ -10,7 +10,10 @@ class DocumentController extends Controller
     public function getDetail($hash)
     {
         $document = Document::where('hash',$hash)->first();
-        $category  = $document->category;
+        if(!$document){
+            abort(404);
+        }
+        $category  = $document->category;        
         $data = compact('document','category');
         return view('templates.'.$document->category->detail_template, $data);
     }

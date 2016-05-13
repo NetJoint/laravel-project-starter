@@ -7,7 +7,7 @@
         <meta name="renderer" content="webkit">
         <meta http-equiv="refresh" content="1;url=/login?jump=/{{Request::path()}}" />
         <title>401</title>
-        <link href="/lib/bootstrap2-sui/css/sui.min.css" rel="stylesheet">
+        <link href="/lib/bootstrap2-sui/css/bootstrap2-sui.css" rel="stylesheet">
         <script src="/lib/jquery/jquery-1.12.1.min.js"></script>
     </head>
     <body>

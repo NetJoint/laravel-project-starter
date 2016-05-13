@@ -1,3 +1,10 @@
+* {
+    box-sizing: border-box;
+}
+*::before, *::after {
+    box-sizing: border-box;
+}
+
 /* @grid */
 .row {
     margin: 0 auto;
