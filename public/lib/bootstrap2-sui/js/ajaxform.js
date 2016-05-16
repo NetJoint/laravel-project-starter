@@ -124,18 +124,17 @@
                                 //textarea
                                 var $textarea = $('textarea[name="' + key + '"]', $form);
                                 if ($textarea.length) {
-                                    if($textarea.val() != value){
+                                    if ($textarea.val() != value) {
                                         $textarea.val(value).trigger("change");
                                     }
-                                } else {
-                                //ueditor    
-                                    var $editor = $('.editor[name="' + key + '"]', $form);
-                                    if ($editor.length) {
-                                        var ue_id = $editor.parent().find('div.editor').attr('id');
-                                        if (ue_id) {
-                                            var ue = UE.getEditor(ue_id);
-                                            ue.setContent(value);
-                                        }
+                                }
+                                //ueditor                                
+                                var $editor = $('.editor[name="' + key + '"]', $form);
+                                if ($editor.length) {
+                                    var ue_id = $editor.parent().find('div.editor').attr('id');
+                                    if (ue_id) {
+                                        var ue = UE.getEditor(ue_id);
+                                        ue.setContent(value);
                                     }
                                 }
                             }
