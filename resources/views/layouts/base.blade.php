@@ -18,7 +18,6 @@
         <link href="/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">        
         @yield("css")        
         <link href="/css/website.css" rel="stylesheet">
-        <link href="/css/bootstrap3_grid.css" rel="stylesheet">
         @yield("style")
         <!--[if lte IE 9]>
               <script src="/lib/iehack/html5shiv.min.js"></script>
